@@ -56,6 +56,9 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+int speed[] = {400, 800};
+int curr_idx_speed = 0;
+
 /* USER CODE END 0 */
 
 /**
@@ -99,13 +102,17 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+	  //Punto1
+	  /*
 	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-	  //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-	  HAL_Delay(500);
+	  HAL_Delay(speed[0]);
+	  */
 
+	  //Punto2
+	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+	  HAL_Delay(speed[curr_idx_speed]);
 	  if (!HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)){
-		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 1);
-		  while(1);
+		  curr_idx_speed = (curr_idx_speed + 1) % 2;
 	  }
 
 
