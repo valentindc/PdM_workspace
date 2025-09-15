@@ -5,13 +5,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Drivers/API/Src/API_delay.c 
+../Drivers/API/Src/API_Delay.c 
 
 OBJS += \
-./Drivers/API/Src/API_delay.o 
+./Drivers/API/Src/API_Delay.o 
 
 C_DEPS += \
-./Drivers/API/Src/API_delay.d 
+./Drivers/API/Src/API_Delay.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +21,7 @@ Drivers/API/Src/%.o Drivers/API/Src/%.su Drivers/API/Src/%.cyclo: ../Drivers/API
 clean: clean-Drivers-2f-API-2f-Src
 
 clean-Drivers-2f-API-2f-Src:
-	-$(RM) ./Drivers/API/Src/API_delay.cyclo ./Drivers/API/Src/API_delay.d ./Drivers/API/Src/API_delay.o ./Drivers/API/Src/API_delay.su
+	-$(RM) ./Drivers/API/Src/API_Delay.cyclo ./Drivers/API/Src/API_Delay.d ./Drivers/API/Src/API_Delay.o ./Drivers/API/Src/API_Delay.su
 
 .PHONY: clean-Drivers-2f-API-2f-Src
 
