@@ -20,18 +20,16 @@ typedef bool bool_t;
 
 /* Structure definition */
 typedef struct{
-   tick_t startTime;
-   tick_t duration;
-   bool_t running;
+   tick_t startTime;   // Tiempo de inicio del delay (en ticks del sistema)
+   tick_t duration;    // Duración del delay (en milisegundos)
+   bool_t running;     // Estado del delay: true = corriendo, false = detenido
 } delay_t;
 
 /* Function prototypes */
-void delayInit( delay_t * delay, tick_t duration );
-bool_t delayRead( delay_t * delay );
-void delayWrite( delay_t * delay, tick_t duration );
-
-
-bool_t delayIsRunning( delay_t * delay );
+void delayInit( delay_t * delay, tick_t duration );     // Inicializa delay no bloqueante
+bool_t delayRead( delay_t * delay );                    // Lee estado del delay (inicia o verifica)
+void delayWrite( delay_t * delay, tick_t duration );    // Modifica duración del delay
+bool_t delayIsRunning( delay_t * delay );               // Verifica si delay está corriendo
 
 
 

@@ -1293,22 +1293,22 @@ Infinite_Loop:
  80009ac:	e7fe      	b.n	80009ac <ADC_IRQHandler>
 
 080009ae <delayInit>:
-
-
-#include "main.h"      // This should include stm32f4xx_hal.h
-#include "API_Delay.h"
-
+ * @brief Inicializa una estructura de delay no bloqueante
+ * @param delay: Puntero a la estructura delay_t a inicializar
+ * @param duration: Duración del delay en milisegundos
+ * @note Esta función debe ser llamada antes de usar delayRead()
+ */
 void delayInit(delay_t * delay, tick_t duration) {
  80009ae:	b480      	push	{r7}
  80009b0:	b083      	sub	sp, #12
  80009b2:	af00      	add	r7, sp, #0
  80009b4:	6078      	str	r0, [r7, #4]
  80009b6:	6039      	str	r1, [r7, #0]
-    delay->duration = duration;
+    delay->duration = duration;    // Establece la duración del delay
  80009b8:	687b      	ldr	r3, [r7, #4]
  80009ba:	683a      	ldr	r2, [r7, #0]
  80009bc:	605a      	str	r2, [r3, #4]
-    delay->running = false;
+    delay->running = false;        // Marca el delay como no iniciado
  80009be:	687b      	ldr	r3, [r7, #4]
  80009c0:	2200      	movs	r2, #0
  80009c2:	721a      	strb	r2, [r3, #8]
@@ -1320,7 +1320,11 @@ void delayInit(delay_t * delay, tick_t duration) {
  80009ce:	4770      	bx	lr
 
 080009d0 <delayRead>:
-
+ * @brief Lee el estado de un delay no bloqueante
+ * @param delay: Puntero a la estructura delay_t a verificar
+ * @retval true si el delay ha expirado, false en caso contrario
+ * @note En la primera llamada inicia el delay, en las siguientes verifica si expiró
+ */
 bool_t delayRead(delay_t * delay) {
  80009d0:	b580      	push	{r7, lr}
  80009d2:	b084      	sub	sp, #16
@@ -1333,20 +1337,22 @@ bool_t delayRead(delay_t * delay) {
  80009e0:	b2db      	uxtb	r3, r3
  80009e2:	2b00      	cmp	r3, #0
  80009e4:	d009      	beq.n	80009fa <delayRead+0x2a>
-        delay->startTime = HAL_GetTick();
+        // Primera vez que se llama: iniciar el delay
+        delay->startTime = HAL_GetTick();  // Captura tiempo actual
  80009e6:	f000 f89d 	bl	8000b24 <HAL_GetTick>
  80009ea:	4602      	mov	r2, r0
  80009ec:	687b      	ldr	r3, [r7, #4]
  80009ee:	601a      	str	r2, [r3, #0]
-        delay->running = true;
+        delay->running = true;             // Marca delay como iniciado
  80009f0:	687b      	ldr	r3, [r7, #4]
  80009f2:	2201      	movs	r2, #1
  80009f4:	721a      	strb	r2, [r3, #8]
-        return false;
+        return false;                      // Delay recién iniciado, no ha expirado
  80009f6:	2300      	movs	r3, #0
  80009f8:	e010      	b.n	8000a1c <delayRead+0x4c>
     } else {
-        tick_t now = HAL_GetTick();
+        // Delay ya iniciado: verificar si ha transcurrido el tiempo
+        tick_t now = HAL_GetTick();        // Obtiene tiempo actual
  80009fa:	f000 f893 	bl	8000b24 <HAL_GetTick>
  80009fe:	60f8      	str	r0, [r7, #12]
         if ((now - delay->startTime) >= delay->duration) {
@@ -1358,15 +1364,16 @@ bool_t delayRead(delay_t * delay) {
  8000a0a:	685b      	ldr	r3, [r3, #4]
  8000a0c:	429a      	cmp	r2, r3
  8000a0e:	d304      	bcc.n	8000a1a <delayRead+0x4a>
-            delay->running = false;
+            // El tiempo ha transcurrido
+            delay->running = false;         // Resetea el delay para próximo uso
  8000a10:	687b      	ldr	r3, [r7, #4]
  8000a12:	2200      	movs	r2, #0
  8000a14:	721a      	strb	r2, [r3, #8]
-            return true;
+            return true;                   // Indica que el delay expiró
  8000a16:	2301      	movs	r3, #1
  8000a18:	e000      	b.n	8000a1c <delayRead+0x4c>
         }
-        return false;
+        return false;                      // Delay aún no ha expirado
  8000a1a:	2300      	movs	r3, #0
     }
 }
@@ -1376,14 +1383,18 @@ bool_t delayRead(delay_t * delay) {
  8000a22:	bd80      	pop	{r7, pc}
 
 08000a24 <delayWrite>:
-
+ * @brief Modifica la duración de un delay existente
+ * @param delay: Puntero a la estructura delay_t a modificar
+ * @param duration: Nueva duración del delay en milisegundos
+ * @note Solo debe usarse cuando el delay no esté corriendo (verificar con delayIsRunning)
+ */
 void delayWrite(delay_t * delay, tick_t duration) {
  8000a24:	b480      	push	{r7}
  8000a26:	b083      	sub	sp, #12
  8000a28:	af00      	add	r7, sp, #0
  8000a2a:	6078      	str	r0, [r7, #4]
  8000a2c:	6039      	str	r1, [r7, #0]
-    delay->duration = duration;
+    delay->duration = duration;    // Actualiza la duración del delay
  8000a2e:	687b      	ldr	r3, [r7, #4]
  8000a30:	683a      	ldr	r2, [r7, #0]
  8000a32:	605a      	str	r2, [r3, #4]
@@ -1395,14 +1406,17 @@ void delayWrite(delay_t * delay, tick_t duration) {
  8000a3e:	4770      	bx	lr
 
 08000a40 <delayIsRunning>:
-
-
+ * @brief Verifica si un delay está actualmente corriendo
+ * @param delay: Puntero a la estructura delay_t a verificar
+ * @retval true si el delay está corriendo, false si está detenido
+ * @note Función auxiliar para verificar estado antes de usar delayWrite()
+ */
 bool_t delayIsRunning(delay_t * delay) {
  8000a40:	b480      	push	{r7}
  8000a42:	b083      	sub	sp, #12
  8000a44:	af00      	add	r7, sp, #0
  8000a46:	6078      	str	r0, [r7, #4]
-    return delay->running;
+    return delay->running;         // Devuelve copia del campo running
  8000a48:	687b      	ldr	r3, [r7, #4]
  8000a4a:	7a1b      	ldrb	r3, [r3, #8]
 }
