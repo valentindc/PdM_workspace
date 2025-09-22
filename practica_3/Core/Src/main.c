@@ -57,12 +57,39 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+typedef enum{
+BUTTON_UP,
+BUTTON_FALLING,
+BUTTON_DOWN,
+BUTTON_RAISING,
+} debounceState_t;
+
 int speed[] = {250, 50, 50, 500};
 int curr_idx = 0;
 int n = 0;
 
 delay_t delay3;
 delay_t delay2;
+
+void debounceFSM_init(){
+	state = BUTTON_UP;
+}		// debe cargar el estado inicial
+
+
+// debe leer las entradas, resolver la lógica de
+// transición de estados y actualizar las salidas
+void debounceFSM_update(){
+
+}
+
+
+void buttonPressed();			// debe encender el LED
+
+
+void buttonReleased();		// debe apagar el LED
+
+
+
 
 
 

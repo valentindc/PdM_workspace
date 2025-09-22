@@ -5,7 +5,6 @@
  *      Author: valentin
  */
 
-
 #include "main.h"      // This should include stm32f4xx_hal.h
 #include "API_Delay.h"
 
