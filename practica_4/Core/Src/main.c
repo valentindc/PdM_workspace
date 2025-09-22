@@ -57,102 +57,9 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int speed[] = {250, 50, 50, 500};
-int curr_idx = 0;
-int n = 0;
-//volatile state;
+const uint32_t speed[] = {500, 100};
 
-delay_t delay3;
-delay_t delay2;
-
-const uint32_t PRESS_TIME = 40; //Time of debounce
-debounceState_t state; //State of the STM button
-
-
-void debounceFSM_init(){		// debe cargar el estado inicial
-	state = BUTTON_UP;
-}
-
-
-
-/*
- * This function must read the input, solve the
- * logic of states transition and update the output
- */
-void debounceFSM_update(void) {
-
-	bool_t button = readButton();      // raw read
-	static delay_t d;                  // persistent debounce timer
-
-	switch (state) {
-		case BUTTON_UP:
-			if (!button) {            // possible press -> start falling debounce
-				state = BUTTON_FALLING;
-				delayInit(&d, PRESS_TIME);
-				delayRead(&d);        // start timer
-			}
-			break;
-
-		case BUTTON_FALLING:
-			if (!button) {            // still pressed?
-				if (delayRead(&d)) {  // debounce elapsed -> confirm press
-					state = BUTTON_DOWN;
-					buttonPressed();
-				}
-			} else {                  // returned to released -> abort
-				state = BUTTON_UP;
-			}
-			break;
-
-		case BUTTON_DOWN:
-			if (button) {             // possible release -> start RAISING debounce
-				state = BUTTON_RAISING;
-				delayInit(&d, PRESS_TIME);
-				delayRead(&d);
-			}
-			break;
-
-		case BUTTON_RAISING:
-			if (button) {             // still released?
-				if (delayRead(&d)) {  // debounce elapsed -> confirm release
-					state = BUTTON_UP;
-					buttonReleased();
-				}
-			} else {                  // pressed again -> abort
-				state = BUTTON_DOWN;
-			}
-			break;
-
-		default:
-			Error_Handler();
-			break;
-	}
-}
-
-
-/*
- * @brief Turns the LED on  when button is pressed
-*/
-void buttonPressed(){
-	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-}
-
-
-/*
- * @brief Turns the LED back off when button is released
-*/
-void buttonReleased(){
-	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-}
-
-
-/*
- * @brief Reads the state of the button (0 if down)
- * @retval boolean corresponding to button state (True = pressed)
-*/
-bool readButton(){
-	return HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin);
-}
+//debounceState_t state; //State of the STM button
 
 /* USER CODE END 0 */
 
@@ -189,8 +96,12 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
-  delayInit(&delay2, speed[0]);
-  delayInit(&delay3, speed[0]);
+
+  delay_t delay;
+  tick_t N_periodos = sizeof(speed)/sizeof(uint32_t);
+  tick_t n = 0;
+
+  delayInit(&delay,speed[n]);
 
   /* USER CODE END 2 */
 
@@ -199,6 +110,16 @@ int main(void)
   while (1)
   {
 	  debounceFSM_update();
+	  if (delayRead(&delay)){
+		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+		  if (readKey()){
+			  n = n+1;
+			  if (n == N_periodos){
+				  n = 0;
+			  }
+			  delayWrite(&delay, speed[n]);
+		  }
+	  }
   }
   /* USER CODE END WHILE */
 

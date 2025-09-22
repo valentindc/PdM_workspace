@@ -5,8 +5,6 @@
  *      Author: valentin
  */
 
-
-
 #ifndef API_INC_API_DELAY_H_
 #define API_INC_API_DELAY_H_
 
@@ -31,6 +29,9 @@ bool_t delayRead( delay_t * delay );                    // Lee estado del delay 
 void delayWrite( delay_t * delay, tick_t duration );    // Modifica duración del delay
 bool_t delayIsRunning( delay_t * delay );               // Verifica si delay está corriendo
 
+void debounceFSM_init();
+bool_t readKey();
+void debounceFSM_update();
 
 
 #endif /* API_INC_API_DELAY_H_ */

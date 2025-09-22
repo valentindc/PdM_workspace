@@ -35,17 +35,12 @@ extern "C" {
 #include <stdint.h>   // para uint32_t
 #include <stdbool.h>  // para bool
 #include "API_Delay.h"
+#include "API_debounce.h"
 
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-typedef enum{
-	BUTTON_UP,
-	BUTTON_FALLING,
-	BUTTON_DOWN,
-	BUTTON_RAISING,
-} debounceState_t;
 
 
 /* USER CODE END ET */
